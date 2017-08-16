@@ -1,6 +1,5 @@
 #lang racket/gui
 (require "character.rkt")
-(require "help_procs.rkt")
 (provide place%)
 
 
@@ -31,13 +30,6 @@
 
 
 
-
-    
-    (define/public (add-char char)                                         ;Updates characters placement and handles if they are already there.
-      (if (occurs? char chars-in-place)                                    ;Occurs? will help to check for duplicates.
-          (display (error "Character already there")) 
-          (hash-set! chars-in-place
-                (send char get-name) char)))
 
     (define/public (char-there? char-name)
           (hash-has-key? chars-in-place char-name))
