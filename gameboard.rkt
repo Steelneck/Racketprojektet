@@ -2,12 +2,15 @@
 (require "place.rkt")
 (require "item.rkt")
 (require "character.rkt")
-(require "help_procs.rkt")
 (require "cmd_store.rkt")
 
 (provide (all-defined-out))
 
-(require racket/trace)
+(define enumerate                
+  (lambda (from to steps)        
+    (if (> from to)
+        '()
+        (cons from (enumerate (+ from steps) to steps)))))
 
 #|Initiate Andreas and some enemies to their own values in the matrix.|#
 

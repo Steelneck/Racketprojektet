@@ -1,6 +1,5 @@
 #lang racket
 (provide item%)
-(require "help_procs.rkt")
 
 
 #|Template for items in the game.|#

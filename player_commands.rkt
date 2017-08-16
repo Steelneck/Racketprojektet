@@ -1,8 +1,5 @@
 #lang racket
-(require "presentation.rkt")
 (require "cmd_store.rkt")
-(require "world_init.rkt")
-(require "help_procs.rkt")
 (require "place.rkt")
 (require "item.rkt")
 (require "gameboard.rkt")
