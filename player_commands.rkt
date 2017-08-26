@@ -1,14 +1,15 @@
 #lang racket
 (require "cmd_store.rkt")
 (require "place.rkt")
+(require "character.rkt")
 (require "item.rkt")
 (require "gameboard.rkt")
+(require "graphic_objects.rkt")
+(require "canvasclasses.rkt")
+
 (provide (all-defined-out))
 
 
-#|Indexhandling for the levels to make sure Andreas can't go to far.|#
-
-  
 
 #|Connects the level to the viewbox, n parameter for how many elements and rows
 while k parameter will drop one column at a time.|#

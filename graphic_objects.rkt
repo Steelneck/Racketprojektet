@@ -1,11 +1,13 @@
 #lang racket/gui
+#|
+
 
 (require "place.rkt")
 (require "character.rkt")
 (require "canvasclasses.rkt")
 (require "timer.rkt")
+(require "gameboard.rkt")
 (provide (all-defined-out))
-
 
 (define game-window                              
   (new frame%
@@ -13,13 +15,26 @@
        [width 1200]
        [height 800]))
 
+(define input-window
+  (new frame%
+       [label "Nothing"]))
+
 (send game-window show #t)
 
 
-#|Drawing functions combined with graphic commands|#
 
+#|Test drawing board|#
 
 (define (draw-map canvas dc)
+  (let ([xtile (send level get-xtile)]
+        [ytile (send level get-ytile)])
+    (send dc set-brush "Red" 'solid)
+    (send dc draw-rectangle 0 0 100 100)))
+
+
+#|Original drawing|#
+
+(define (draw-map1 canvas dc)
   (let ([xpos (send level get-xpos)]
         [ypos (send level get-ypos)])
   (send dc set-brush "DodgerBlue" 'solid)
@@ -32,19 +47,7 @@
   (send dc translate (- xpos) (- ypos))))
 
 
-(define (key-proc key-event)
-  (when (eq? (send key-event get-key-code) 'up)
-    (send physics-timer-jump start 32))
-  (when (eq? (send key-event get-key-code) 'down)
-    (send level move-ypos + 10))
-  (when (eq? (send key-event get-key-code) 'left)
-    (send level move-xpos - 10))
-  (when (eq? (send key-event get-key-code) 'right)
-      (send level move-xpos + 10)))
-
-
 #|Graphic viewbox and background|#
-
 
 (define level
   (new design-canvas%
@@ -52,17 +55,16 @@
        [name "The entire level!"]
        [description "The blue background with red floor"]
        [paint-callback draw-map]
-       [keyboard-handler key-proc]))
-
-
-#|Characters|#
-
-
-(define player
-  (new character%
-       [name "Andreas"]
-       [talk-line "LF Golbal 1337"]
-       [description "The one and only"]))
+       [keyboard-handler
+        (lambda (key-event)
+          (when (eq? (send key-event get-key-code) 'up)
+            (send physics-timer-jump start 32))
+          (when (eq? (send key-event get-key-code) 'down)
+            (send level move-ypos + 10))
+          (when (eq? (send key-event get-key-code) 'left)
+            (send level move-xpos - 10))
+          (when (eq? (send key-event get-key-code) 'right)
+            (send level move-xpos + 10)))]))
 
 
 #|Timers|#
@@ -82,6 +84,7 @@
 Need 3 different parameters to make sure the
 animation is performed correctly (time-up,
 time-down and time-gate.|#
+
 
 (define physics-timer-jump
   (new design-timer%
@@ -103,7 +106,12 @@ time-down and time-gate.|#
               (send level move-ypos - 10)
               (send physics-timer-jump inc-time)
               (when (= time-up 640)
-                (send physics-timer-jump open-gate-1)))))]))
+                (send physics-timer-jump open-gate-1)))))]))|#
+
+
+
+
+
 
 
 
