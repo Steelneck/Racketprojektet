@@ -13,10 +13,8 @@
                 [xpos-tile 0]
                 [ypos-tile 0]
                 [x-size 120]
-                [y-size 80])
-
-    (field
-     [level-objects (make-hash)])
+                [y-size 80]
+                [level-objects '()])
 
 
     #|Pixel values with functions|#
@@ -53,8 +51,18 @@
       (send dc draw-ellipse 400 600 40 40)
       (send dc translate (- xpos-tile) (- ypos-tile)))
 
-    (define/public (test dc)
-      (draw-sky dc))
+  ;  (define/public (list-drawings dc element xpos-tile n)
+  ;    (cond
+  ;      ((null? element)
+  ;       level-objects)
+  ;      ((= n 0)
+  ;       level-objects)
+  ;      ((= element 1)
+  ;       (cons (draw-sky dc xpos-tile ypos-tile) level-objects)
+  ;       (list-drawings dc (+ xpos-tile x-size) (- n 1)
+  ;      (else
+  ;       (cons (draw-sky dc xpos-tile ypos-tile) level-objects)
+  ;       (cons (list-drawings dc (+ xpos-tile x-size) (- n 1)) level-objects))))
 
     (define/public (move-xpos operator pixels)
       (set! xpos-tile (operator xpos-tile pixels)))
@@ -69,16 +77,14 @@
 
     (define/public (canvasobjects dc)
       (draw-sky dc 0 0)
-      (draw-sky dc 120 80)
+      (draw-sky dc 120 0)
       (draw-sky dc 240 80))
 
 
 
     
-    (define/public (add-canvas object)
-      (if (hash-has-key? level-objects object)
-          (display ("Object already in place"))
-          (hash-set! level-objects (send object get-name) object)))
+    (define/public (add-canvas drawing proc)
+      (hash-set! level-objects drawing proc))
 
     (define/public (get-objects)                                  
       (hash-keys level-objects))

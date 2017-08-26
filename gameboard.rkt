@@ -7,6 +7,8 @@
 (require "canvasclasses.rkt")
 (require "timer.rkt")
 
+
+
 (provide (all-defined-out))
 
 #|Initiate Andreas and some enemies to their own values in the matrix.|#
@@ -129,7 +131,7 @@ for the viewbox (i are rows, j are columns) and 10 squares height with 250 squar
        [description "The blue background with red floor"]
        [paint-callback
         (lambda (canvas dc)
-          (send level canvasobjects dc))]
+          (send level draw-player dc))]
        [keyboard-handler
         (lambda (key-event)
           (when (eq? (send key-event get-key-code) 'up)
@@ -140,6 +142,9 @@ for the viewbox (i are rows, j are columns) and 10 squares height with 250 squar
             (send level move-xpos - 10))
           (when (eq? (send key-event get-key-code) 'right)
             (send level move-xpos + 10)))]))
+
+
+
 
 
 #|Timers|#
@@ -187,4 +192,11 @@ time-down and time-gate.|#
   
 
 
-    
+(define (count)
+  (let ([number 0])
+    (if (= number 380)
+        (set! number 0)
+        (and number (set! number (+ number 120))))))
+
+
+
