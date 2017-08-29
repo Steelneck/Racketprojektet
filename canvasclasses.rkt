@@ -12,93 +12,87 @@
                 keyboard-handler
                 [xpos-tile 0]
                 [ypos-tile 0]
+                [translate-xpos 0]
+                [translate-ypos 0]
                 [x-size 120]
                 [y-size 80]
-                [level-objects '()])
+                [level-objects '()]
+                [canvas-objects '()])
 
 
     #|Pixel values with functions|#
 
-    (define/public (get-tile-x)
-      xpos-tile)
-
-    (define/public (get-tile-y)
-      ypos-tile)
-
-    (define/public (next-tile-x)
-      (set! xpos-tile (+ xpos-tile x-size)))
-
-    (define/public (next-tile-y)
-      (set! ypos-tile (+ ypos-tile y-size)))
-
-    (define/public (reset-tile-x)
-      (set! xpos-tile 0))
-
-    (define/public (reset-tile-y)
-      (set! ypos-tile 0))
-
-    (define/public (draw-sky dc xpos-tile ypos-tile)
+    (define/public (draw-sky dc xpos ypos)
+      (send dc translate translate-xpos translate-ypos)
       (send dc set-brush "DodgerBlue" 'solid)
-      (send dc draw-rectangle xpos-tile ypos-tile 120 80))
+      (send dc draw-rectangle xpos ypos x-size y-size)
+      (send dc translate (- translate-xpos) (- translate-ypos)))
 
-    (define/public (draw-ground dc)
+    (define/public (draw-ground dc xpos ypos)
+      (send dc translate translate-xpos translate-ypos)
       (send dc set-brush "Firebrick" 'solid)
-      (send dc draw-rectangle 0 640 3600 160))
+      (send dc draw-rectangle xpos ypos x-size y-size)
+      (send dc translate (- translate-xpos) (- translate-ypos)))
 
-    (define/public (draw-player dc)
-      (send dc translate xpos-tile ypos-tile)
+    (define/public (draw-power-up dc xpos ypos)
+      (send dc translate translate-xpos translate-ypos)
+      (send dc set-brush "Lime" 'solid)
+      (send dc draw-rectangle xpos ypos x-size y-size)
+      (send dc translate (- translate-xpos) (- translate-ypos)))
+
+    (define/public (draw-enemy1 dc xpos ypos)
+      (send dc translate translate-xpos translate-ypos)
+      (send dc set-brush "DarkMagenta" 'solid)
+      (send dc draw-rectangle xpos ypos x-size y-size)
+      (send dc translate (- translate-xpos)  (- translate-ypos)))
+
+    (define/public (draw-player dc xpos ypos)
       (send dc set-brush "red" 'solid)
-      (send dc draw-ellipse 400 600 40 40)
-      (send dc translate (- xpos-tile) (- ypos-tile)))
-
-  ;  (define/public (list-drawings dc element xpos-tile n)
-  ;    (cond
-  ;      ((null? element)
-  ;       level-objects)
-  ;      ((= n 0)
-  ;       level-objects)
-  ;      ((= element 1)
-  ;       (cons (draw-sky dc xpos-tile ypos-tile) level-objects)
-  ;       (list-drawings dc (+ xpos-tile x-size) (- n 1)
-  ;      (else
-  ;       (cons (draw-sky dc xpos-tile ypos-tile) level-objects)
-  ;       (cons (list-drawings dc (+ xpos-tile x-size) (- n 1)) level-objects))))
-
-    (define/public (move-xpos operator pixels)
-      (set! xpos-tile (operator xpos-tile pixels)))
-
-    (define/public (move-ypos operator pixels)
-      (set! ypos-tile (operator ypos-tile pixels)))
-      
+      (send dc draw-ellipse xpos ypos x-size y-size))
 
 
+    #|List-drawings will gather all the information from the matrix and "create" canvas objects with
+      x and y coordinates for every element. The result is a list that paint-callback will paint from.
+      When xpos is 1000, reset it and increase ypos. Elements like 1 and 100 will be painted sky while
+      50 will be painted as ground etc.|#
 
-    #|Hash objects with functions|#
+    (define/public (list-merging list-board)                                          
+      (if (null? list-board)
+          '()
+          (append (vector->list (car list-board))
+                  (list-merging (cdr list-board)))))
 
-    (define/public (canvasobjects dc)
-      (draw-sky dc 0 0)
-      (draw-sky dc 120 0)
-      (draw-sky dc 240 80))
-
-
+    (define/public (list-elements board)
+      (list-merging (vector->list (send board get-board))))
 
     
-    (define/public (add-canvas drawing proc)
-      (hash-set! level-objects drawing proc))
-
-    (define/public (get-objects)                                  
-      (hash-keys level-objects))
-
-    (define/public (get-object name)
-      (hash-ref level-objects name))
-
-    (define/public (move-object-to new-object)                      
+    (define/public (list-drawings dc xpos ypos list-board)
       (cond
-        ((hash-has-key? level-objects new-object)
-         (display (error "Object already there.")))     
-        (else
-         (when (not (null? level-objects))              
-           (add-canvas new-object)))))
+        ((null? list-board)
+         '())
+        ((= xpos 1440)
+         (list-drawings dc 0 (+ ypos y-size) list-board))
+        ((or (equal? (car list-board) '#(1))
+             (equal? (car list-board) '#(10))
+             (equal? (car list-board) '#(666)))
+         (cons (draw-sky dc xpos ypos) canvas-objects)
+         (cons (list-drawings dc (+ xpos x-size) ypos (cdr list-board)) canvas-objects))
+        ((equal? (car list-board) '#(20))
+         (cons (draw-ground dc xpos ypos) canvas-objects)
+         (cons (list-drawings dc (+ xpos x-size) ypos (cdr list-board)) canvas-objects))
+        ((equal? (car list-board) '#(40))
+         (cons (draw-power-up dc xpos ypos) canvas-objects)
+         (cons (list-drawings dc (+ xpos x-size) ypos (cdr list-board)) canvas-objects))
+        ((equal? (car list-board) '#(30))
+         (cons (draw-enemy1 dc xpos ypos) canvas-objects)
+         (cons (list-drawings dc (+ xpos x-size) ypos (cdr list-board)) canvas-objects))))
+    
+
+    (define/public (move-xpos operator pixels)
+      (set! translate-xpos (operator translate-xpos pixels)))
+
+    (define/public (move-ypos operator pixels)
+      (set! translate-ypos (operator translate-ypos pixels)))
 
 
     [define/override (on-char key-event)

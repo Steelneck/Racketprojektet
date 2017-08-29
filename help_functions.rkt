@@ -11,3 +11,16 @@
     (if (> from to)
         '()
         (cons from (enumerate (+ from steps) to steps)))))
+
+#|Function to return elements from a matrix into a list|#
+
+;(define (vector-merging vector-board)
+;  (if (null? vector-board)
+;      '#()
+;      (vector-append (car vector-board)
+;                     (vector-merging (cdr vector-board)))))
+
+
+
+
+

@@ -85,19 +85,19 @@ are taken or enemies destroyed.|#
 
 (define (handle-collision col-val row col lvl-col arg)
   (cond
-    [(or (equal? col-val '#(50))
-         (equal? col-val '#(100)))
+    [(or (equal? col-val '#(10))
+         (equal? col-val '#(20)))
      #f]
-    [(equal? col-val '#(20))
+    [(equal? col-val '#(30))
      (displayln "Power-up gained!")
      (send andreas inc-score-power)
      (vector-set! (vector-ref (send level1 get-board) row) lvl-col '#(1))]
-    [(and (equal? col-val '#(90))
+    [(and (equal? col-val '#(30))
           (equal? arg 'fall))
      (displayln "ENEMY SLAIN")
      (send andreas inc-score-enemy)
      (vector-set! (vector-ref (send level1 get-board) row) lvl-col '#(1))]
-    [(equal? col-val '#(90))
+    [(equal? col-val '#(30))
      (displayln "I LOSE LIFE!")
      (send andreas lose-life)]
     (else #t)))

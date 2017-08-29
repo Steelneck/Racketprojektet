@@ -12,9 +12,6 @@
                 [timer-up 0]
                 [timer-down 0]
                 [timer-gate-val 0])
-    
-    (field
-     [object-timer (make-hash)])
 
     (define/public (get-timer-up)
       timer-up)
